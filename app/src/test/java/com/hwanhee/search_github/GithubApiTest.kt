@@ -1,5 +1,6 @@
 package com.hwanhee.search_github
 import com.google.gson.Gson
+import com.hwanhee.search_github.model.vo.SearchWord
 import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.BehaviorSpec
@@ -12,10 +13,16 @@ import okhttp3.mockwebserver.MockWebServer
 @OptIn(ExperimentalKotest::class)
 class GithubApiTest : BehaviorSpec() {
     private lateinit var server: MockWebServer
+    private lateinit var testHelper: TestHelper
+    private lateinit var api: GithubApi
 
     override fun beforeSpec(spec: Spec) {
         server = MockWebServer()
         server.start()
+
+        //testHelper = TestHelperRealServer()
+        testHelper = TestHelperMock(server.url("/"))
+        api = testHelper.provideGithubApi()
     }
 
     override fun afterSpec(spec: Spec) {
@@ -27,7 +34,6 @@ class GithubApiTest : BehaviorSpec() {
 
         given("사용자 검색 테스트") {
             `when`("q=test page=1 per_page=20") {
-                val api = TestHelper.provideGithubApi(server.url("/"))
                 server.enqueueResponse("q=test_page=1_perpage=20.json", 200)
                 val res = api.search("test", 1, 20)
 
@@ -47,9 +53,8 @@ class GithubApiTest : BehaviorSpec() {
             }
 
             `when`("q=tetris+language:assembly page=1 per_page=20") {
-                val api = TestHelper.provideGithubApi(server.url("/"))
                 server.enqueueResponse("q=tetris+language:assembly_page=1_perpage=20.json", 200)
-                val res = api.search("tetris+language:assembly", 1, 20)
+                val res = api.search(SearchWord("tetris", "assembly"), 1, 20)
 
                 then("200 response 되어야한다.") {
                     res.isSuccessful shouldBe true
@@ -80,7 +85,6 @@ class GithubApiTest : BehaviorSpec() {
             }
 
             `when`("검색어가 빈칸일 때") {
-                val api = TestHelper.provideGithubApi(server.url("/"))
                 server.enqueueResponse("githubapi-error-422.json", 422)
                 val res = api.search("", 1, 20)
 
@@ -88,7 +92,6 @@ class GithubApiTest : BehaviorSpec() {
                     res.isSuccessful shouldBe false
                     res.code() shouldBe 422
                 }
-
             }
         }
     }

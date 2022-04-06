@@ -1,6 +1,7 @@
 package com.hwanhee.search_github
 
 import com.hwanhee.search_github.di.BaseHeaderInterceptor
+import com.hwanhee.search_github.di.RetrofitModule
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -12,31 +13,37 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.nio.charset.StandardCharsets
 
-class TestHelper {
-    companion object {
-        fun provideGithubApi(baseUrl: HttpUrl): GithubApi {
-            val provider = TestHelper()
-            val client = provider.provideAuthInterceptorOkHttpClient(
-                provider.provideHttpLoggingInterceptor(),
-                provider.provideBaseHeaderInterceptor(),
-            )
-            val retrofit = provider.provideRetrofit(client, baseUrl)
-            val service = provider.provideGithubApiService(retrofit)
-            return GithubApi(service)
-        }
+interface TestHelper {
+    fun provideGithubApi() : GithubApi
+}
+
+class TestHelperRealServer: TestHelper {
+    override fun provideGithubApi(): GithubApi {
+        val provider = RetrofitModule()
+        val client = provider.provideAuthInterceptorOkHttpClient(
+            provider.provideHttpLoggingInterceptor(),
+            provider.provideBaseHeaderInterceptor(),
+        )
+        val retrofit = provider.provideRetrofit(client)
+        val service = provider.provideGithubApiService(retrofit)
+        return GithubApi(service)
+    }
+}
+
+class TestHelperMock(private val baseUrl: HttpUrl): TestHelper {
+    override fun provideGithubApi(): GithubApi {
+        val provider = RetrofitModule()
+
+        val client = provider.provideAuthInterceptorOkHttpClient(
+            provider.provideHttpLoggingInterceptor(),
+            provider.provideBaseHeaderInterceptor(),
+        )
+        val retrofit = provideRetrofit(client, baseUrl)
+        val service = provider.provideGithubApiService(retrofit)
+        return GithubApi(service)
     }
 
-    fun provideAuthInterceptorOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor,
-        baseHeaderInterceptor: BaseHeaderInterceptor
-    )
-            = OkHttpClient
-        .Builder()
-        .addInterceptor(httpLoggingInterceptor)
-        .addInterceptor(baseHeaderInterceptor)
-        .build()
-
-    fun provideRetrofit(
+    private fun provideRetrofit(
         okHttpClient: OkHttpClient,
         baseUrl: HttpUrl
     ): Retrofit
@@ -46,18 +53,6 @@ class TestHelper {
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(baseUrl)
         .build()
-
-    fun provideGithubApiService(
-        retrofit: Retrofit
-    ): GithubApi.Service
-            = retrofit.create(GithubApi.Service::class.java)
-
-    fun provideHttpLoggingInterceptor()
-            = HttpLoggingInterceptor()
-        .setLevel(HttpLoggingInterceptor.Level.BODY)
-
-    fun provideBaseHeaderInterceptor()
-            = BaseHeaderInterceptor()
 }
 
 internal fun MockWebServer.enqueueResponse(fileName: String, code: Int) {
