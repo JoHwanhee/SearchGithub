@@ -28,7 +28,7 @@ class GithubApi @Inject constructor(private val service: Service) {
     ) = service.getRepositories(
         query,
         page,
-        size=perPage
+        size = if(perPage < 1) 20 else perPage
     )
 
     interface Service {
