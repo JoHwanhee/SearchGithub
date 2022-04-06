@@ -8,4 +8,9 @@ internal class SearchWordTest : StringSpec({
     "keyword: tetris, language:assembly" {
         SearchWord("tetris", "assembly").toString() shouldBe "tetris+language:assembly"
     }
+
+    "언어를 빈칸으로 줬을 때" {
+        SearchWord("tetris", "").toString() shouldBe "tetris"
+        SearchWord("tetris").toString() shouldBe "tetris"
+    }
 })
