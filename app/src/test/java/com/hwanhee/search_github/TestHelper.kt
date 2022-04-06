@@ -1,16 +1,16 @@
 package com.hwanhee.search_github
 
-import android.content.Context
-import com.hwanhee.search_github.base.GITHUB_API_HOST
 import com.hwanhee.search_github.di.BaseHeaderInterceptor
-import com.hwanhee.search_github.di.RetrofitModule
-import dagger.Provides
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okio.buffer
+import okio.source
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
+import java.nio.charset.StandardCharsets
 
 class TestHelper {
     companion object {
@@ -58,4 +58,18 @@ class TestHelper {
 
     fun provideBaseHeaderInterceptor()
             = BaseHeaderInterceptor()
+}
+
+internal fun MockWebServer.enqueueResponse(fileName: String, code: Int) {
+    val inputStream = javaClass.classLoader?.getResourceAsStream("api-response/$fileName")
+
+    val source = inputStream?.let { inputStream.source().buffer() }
+    source?.let {
+        enqueue(
+            MockResponse()
+                .addHeader("Content-Type", "application/json; charset=utf-8")
+                .setResponseCode(code)
+                .setBody(source.readString(StandardCharsets.UTF_8))
+        )
+    }
 }
