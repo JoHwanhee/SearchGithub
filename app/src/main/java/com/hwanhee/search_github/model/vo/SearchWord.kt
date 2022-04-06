@@ -1,8 +1,8 @@
 package com.hwanhee.search_github.model.vo
 
 class SearchWord(
-    val keyword: String,
-    val language: String = ""
+    private val keyword: String,
+    private val language: String = ""
 ) {
     override fun toString(): String {
         if(language.isEmpty())
