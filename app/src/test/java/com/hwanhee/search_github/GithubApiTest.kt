@@ -20,8 +20,8 @@ class GithubApiTest : BehaviorSpec() {
         server = MockWebServer()
         server.start()
 
-        //testHelper = TestHelperRealServer()
-        testHelper = TestHelperMock(server.url("/"))
+        testHelper = TestHelperRealServer()
+        //testHelper = TestHelperMock(server.url("/"))
         api = testHelper.provideGithubApi()
     }
 
@@ -43,6 +43,63 @@ class GithubApiTest : BehaviorSpec() {
                 }
 
                 then("items 개수 20개 되어야한다.") {
+                    val body = res.body()
+
+                    body shouldNotBe null
+                    body?.let {
+                        it.items.count() shouldBe 20
+                    }
+                }
+            }
+
+            `when`("q=test page=1 per_page=1") {
+                server.enqueueResponse("q=test_page=1_perpage=1.json", 200)
+                val res = api.search("test", 1, 1)
+
+                then("200 response 되어야한다.") {
+                    res.isSuccessful shouldBe true
+                    res.code() shouldBe 200
+                }
+
+                then("items 개수 1개 되어야한다.") {
+                    val body = res.body()
+
+                    body shouldNotBe null
+                    body?.let {
+                        it.items.count() shouldBe 1
+                    }
+                }
+            }
+
+            `when`("q=test page=1 per_page=-1") {
+                server.enqueueResponse("q=test_page=1_perpage=20.json", 200)
+                val res = api.search("test", 1, -1)
+
+                then("200 response 되어야한다.") {
+                    res.isSuccessful shouldBe true
+                    res.code() shouldBe 200
+                }
+
+                then("items 개수 기본값으로 변경되어 20개 되어야한다.") {
+                    val body = res.body()
+
+                    body shouldNotBe null
+                    body?.let {
+                        it.items.count() shouldBe 20
+                    }
+                }
+            }
+
+            `when`("q=test page=1 per_page=0") {
+                server.enqueueResponse("q=test_page=1_perpage=20.json", 200)
+                val res = api.search("test", 1, 0)
+
+                then("200 response 되어야한다.") {
+                    res.isSuccessful shouldBe true
+                    res.code() shouldBe 200
+                }
+
+                then("items 개수 기본값으로 변경되어 20개 되어야한다.") {
                     val body = res.body()
 
                     body shouldNotBe null
