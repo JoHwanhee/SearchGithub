@@ -1,18 +1,43 @@
 package com.hwanhee.search_github
 
 import com.hwanhee.search_github.model.dto.RepositoryResponseDto
+import com.hwanhee.search_github.model.vo.SearchWord
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Query
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class GithubApi @Inject constructor(private val service: Service) {
-    suspend fun search(word: String) = service.getRepositories()
+
+    suspend fun search(
+        query: SearchWord,
+        page: Int,
+        perPage: Int
+    ) = search(
+        query.toString(),
+        page,
+        perPage
+    )
+
+    suspend fun search(
+        query: String,
+        page: Int,
+        perPage: Int
+    ) = service.getRepositories(
+        query,
+        page,
+        size=perPage
+    )
 
     interface Service {
-        // todo : 수정
-        @GET("/search/repositories?q=test&page=1&per_page=20&order=desc")
-        suspend fun getRepositories(): Response<RepositoryResponseDto>
+        @GET("/search/repositories")
+        suspend fun getRepositories(
+            @Query(value = "q") query: String,
+            @Query(value = "page") page: Int,
+            @Query(value = "order") order: String = "desc",
+            @Query(value = "per_page") size: Int = 20,
+        ): Response<RepositoryResponseDto>
     }
 }
