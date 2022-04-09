@@ -81,6 +81,46 @@ class GithubTopicDaoTest {
         Assert.assertTrue(topics.count() == 0)
     }
 
+    @Test
+    fun `토픽_LIKE_검색이_되어야_한다`() = runBlocking {
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+
+        val topic = createTestTopic(item.id)
+        val topic2 = createTestTopic(item.id)
+        val topic3 = createTestTopic(item.id)
+        val topic4 = createTestTopic(item.id)
+        val topicArray = arrayListOf(topic, topic2, topic3, topic4)
+
+        ownersDao.insert(owners)
+        itemDao.insert(item)
+        topicDao.insert(topicArray)
+
+        val itemAndOwner = itemDao.search("%토픽%")
+        Assert.assertNotNull(itemAndOwner)
+        Assert.assertTrue(itemAndOwner.count() == 1)
+    }
+
+    @Test
+    fun `토픽_LIKE_검색이_안_되어야_한다`() = runBlocking {
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+
+        val topic = createTestTopic(item.id)
+        val topic2 = createTestTopic(item.id)
+        val topic3 = createTestTopic(item.id)
+        val topic4 = createTestTopic(item.id)
+        val topicArray = arrayListOf(topic, topic2, topic3, topic4)
+
+        ownersDao.insert(owners)
+        itemDao.insert(item)
+        topicDao.insert(topicArray)
+
+        val itemAndOwner = itemDao.search("%없는 검색 쿼리!!!!!%")
+        Assert.assertNotNull(itemAndOwner)
+        Assert.assertTrue(itemAndOwner.count() == 0)
+    }
+
     @After
     fun tearDown() {
         Dispatchers.resetMain()

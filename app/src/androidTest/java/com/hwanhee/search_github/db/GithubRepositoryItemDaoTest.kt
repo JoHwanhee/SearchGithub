@@ -52,6 +52,7 @@ class GithubRepositoryItemDaoTest {
 
         val itemAndOwner = itemDao.findGithubRepositoryAndOwnersByRepositoryId(item.id)
         Assert.assertNotNull(itemAndOwner)
+        Assert.assertTrue(itemAndOwner.count() == 1)
     }
 
     @Test
@@ -63,6 +64,43 @@ class GithubRepositoryItemDaoTest {
 
         val itemAndOwner = itemDao.findGithubRepositoryAndOwnersByOwnerId(owners.id)
         Assert.assertNotNull(itemAndOwner)
+        Assert.assertTrue(itemAndOwner.count() == 1)
+    }
+
+    @Test
+    fun `이름_LIKE_검색이_되어야_한다`() = runBlocking {
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+        ownersDao.insert(owners)
+        itemDao.insert(item)
+
+        val itemAndOwner = itemDao.search("%테스트%")
+        Assert.assertNotNull(itemAndOwner)
+        Assert.assertTrue(itemAndOwner.count() == 1)
+    }
+
+    @Test
+    fun `개발_언어_LIKE_검색이_되어야_한다`() = runBlocking {
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+        ownersDao.insert(owners)
+        itemDao.insert(item)
+
+        val itemAndOwner = itemDao.searchByLanguage("%테스트%", "assembly")
+        Assert.assertNotNull(itemAndOwner)
+        Assert.assertTrue(itemAndOwner.count() == 1)
+    }
+
+    @Test
+    fun `개발_언어_LIKE_검색이_안_되어야_한다`() = runBlocking {
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+        ownersDao.insert(owners)
+        itemDao.insert(item)
+
+        val itemAndOwner = itemDao.searchByLanguage("%테스트%", "assembly3333")
+        Assert.assertNotNull(itemAndOwner)
+        Assert.assertTrue(itemAndOwner.count() == 0)
     }
 
     @After

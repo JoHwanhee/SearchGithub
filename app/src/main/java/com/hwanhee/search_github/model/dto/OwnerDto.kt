@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 data class OwnerDto (
 
   @SerializedName("login"               ) var login             : String?  = null,
-  @SerializedName("id"                  ) var id                : Int?     = null,
+  @SerializedName("id"                  ) var id                : Long?     = null,
   @SerializedName("node_id"             ) var nodeId            : String?  = null,
   @SerializedName("avatar_url"          ) var avatarUrl         : String?  = null,
   @SerializedName("gravatar_id"         ) var gravatarId        : String?  = null,

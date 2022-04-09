@@ -34,6 +34,6 @@ fun createTestOwners(id:Long): GithubRepositoryOwnerEntity {
 fun createTestTopic(repositoryId:Long): GithubTopicEntity {
     return GithubTopicEntity(
         repositoryId = repositoryId,
-        "테스트"
+        "테스트 토픽 $repositoryId"
     )
 }

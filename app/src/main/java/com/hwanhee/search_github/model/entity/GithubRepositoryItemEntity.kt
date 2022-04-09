@@ -3,6 +3,8 @@ package com.hwanhee.search_github.model.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.hwanhee.search_github.model.dto.ItemDto
+import com.hwanhee.search_github.model.ui.RepositoryUIItem
 import java.time.LocalDateTime
 
 @Entity(tableName = "github_repository_item")
@@ -21,4 +23,23 @@ data class GithubRepositoryItemEntity (
     @ColumnInfo(name ="language") val language : String,
     @ColumnInfo(name ="disabled") val disabled : Boolean,
     @ColumnInfo(name = "created_at") val createdAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    companion object {
+        fun from(itemDto: ItemDto)
+                = GithubRepositoryItemEntity(
+                itemDto.id ?: 0,
+            itemDto.name ?: "",
+            itemDto.fullName ?: "",
+            itemDto.private ?: false,
+            itemDto.ownerDto?.id ?: 0,
+            itemDto.description ?: "",
+            itemDto.htmlUrl ?: "",
+            itemDto.homepage ?: "",
+            itemDto.stargazersCount ?: 0,
+            itemDto.watchersCount ?: 0,
+            itemDto.forksCount ?: 0,
+            itemDto.language ?: "",
+            itemDto.disabled ?: false,
+            )
+    }
+}

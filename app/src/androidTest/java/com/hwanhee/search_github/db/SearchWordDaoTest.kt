@@ -43,12 +43,11 @@ class SearchWordDaoTest {
     @Test
     fun `기본_insert_와_get_이_잘되어야한다`() = runBlocking {
         val word = SearchWordEntity( 0,"tetris", "Assembly")
-        searchWordDao.insert(word)
+        searchWordDao.upsert(word)
 
         val words = searchWordDao.findSearchWordGreaterThen(word.createdAt)
-        val found = words.find { it.id == word.id }
-
-        Assert.assertNotNull(found)
+        Assert.assertNotNull(words)
+        Assert.assertTrue(words.count() == 1)
     }
 
     @Test
@@ -58,9 +57,9 @@ class SearchWordDaoTest {
 
         val date = LocalDateTime.of(2023, 1, 1, 1, 1)
         val words = searchWordDao.findSearchWordGreaterThen(date)
-        val found = words.find { it.id == word.id }
+        Assert.assertNotNull(words)
+        Assert.assertTrue(words.count() == 0)
 
-        Assert.assertNull(found)
     }
 
     @After

@@ -9,5 +9,6 @@ data class GithubRepositoryItemAndOwner(
          parentColumn = "owner_id",
          entityColumn = "id"
     )
-    val ownersEntity: GithubRepositoryOwnerEntity
+    val ownersEntity: GithubRepositoryOwnerEntity,
+
 )

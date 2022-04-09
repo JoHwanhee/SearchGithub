@@ -3,9 +3,9 @@ package com.hwanhee.search_github.model.dto
 import com.google.gson.annotations.SerializedName
 
 
-data class ItemsDto (
+data class ItemDto (
 
-  @SerializedName("id"                ) var id               : Int?              = null,
+  @SerializedName("id"                ) var id               : Long?              = null,
   @SerializedName("node_id"           ) var nodeId           : String?           = null,
   @SerializedName("name"              ) var name             : String?           = null,
   @SerializedName("full_name"         ) var fullName         : String?           = null,

@@ -3,6 +3,7 @@ package com.hwanhee.search_github
 import com.hwanhee.search_github.di.IoDispatcher
 import com.hwanhee.search_github.model.dto.RepositoryResponseDto
 import com.hwanhee.search_github.model.safeApiCall
+import com.hwanhee.search_github.model.vo.RequestPage
 import com.hwanhee.search_github.model.vo.SearchWord
 import kotlinx.coroutines.CoroutineDispatcher
 import retrofit2.Response
@@ -15,6 +16,15 @@ import javax.inject.Singleton
 class GithubApi @Inject constructor(private val service: Service,
                                     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
+    suspend fun search(
+        query: SearchWord,
+        page: RequestPage,
+    ) = search(
+        query.toString(),
+        page.page,
+        page.perPage
+    )
+
     suspend fun search(
         query: SearchWord,
         page: Int,

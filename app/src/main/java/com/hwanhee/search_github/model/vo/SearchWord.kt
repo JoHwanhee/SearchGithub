@@ -1,9 +1,11 @@
 package com.hwanhee.search_github.model.vo
 
 class SearchWord(
-    private val keyword: String,
-    private val language: String = ""
+    val keyword: String,
+    val language: String = ""
 ) {
+    val isExtensionSearch = language.isNotEmpty()
+
     override fun toString(): String {
         if(language.isEmpty())
             return keyword
@@ -11,3 +13,8 @@ class SearchWord(
         return "${keyword}+language:${language}"
     }
 }
+
+data class RequestPage (
+    val page: Int,
+    val perPage: Int
+)
