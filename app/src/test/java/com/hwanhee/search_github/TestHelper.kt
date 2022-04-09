@@ -1,9 +1,11 @@
 package com.hwanhee.search_github
 
 import com.hwanhee.search_github.di.BaseHeaderInterceptor
+import com.hwanhee.search_github.di.IoDispatcher
 import com.hwanhee.search_github.di.RetrofitModule
 import com.hwanhee.search_github.model.entity.GithubRepositoryItemEntity
 import com.hwanhee.search_github.model.entity.GithubRepositoryOwnerEntity
+import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -19,7 +21,9 @@ interface TestHelper {
     fun provideGithubApi() : GithubApi
 }
 
-class TestHelperRealServer: TestHelper {
+class TestHelperRealServer(
+    private val dispatcher: CoroutineDispatcher,
+): TestHelper {
     override fun provideGithubApi(): GithubApi {
         val provider = RetrofitModule()
         val client = provider.provideAuthInterceptorOkHttpClient(
@@ -28,11 +32,13 @@ class TestHelperRealServer: TestHelper {
         )
         val retrofit = provider.provideRetrofit(client)
         val service = provider.provideGithubApiService(retrofit)
-        return GithubApi(service)
+        return GithubApi(service, dispatcher)
     }
 }
 
-class TestHelperMock(private val baseUrl: HttpUrl): TestHelper {
+class TestHelperMock(
+    private val dispatcher: CoroutineDispatcher,
+    private val baseUrl: HttpUrl): TestHelper {
     override fun provideGithubApi(): GithubApi {
         val provider = RetrofitModule()
 
@@ -42,7 +48,7 @@ class TestHelperMock(private val baseUrl: HttpUrl): TestHelper {
         )
         val retrofit = provideRetrofit(client, baseUrl)
         val service = provider.provideGithubApiService(retrofit)
-        return GithubApi(service)
+        return GithubApi(service, dispatcher)
     }
 
     private fun provideRetrofit(

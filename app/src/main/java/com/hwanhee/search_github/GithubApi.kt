@@ -1,7 +1,10 @@
 package com.hwanhee.search_github
 
+import com.hwanhee.search_github.di.IoDispatcher
 import com.hwanhee.search_github.model.dto.RepositoryResponseDto
+import com.hwanhee.search_github.model.safeApiCall
 import com.hwanhee.search_github.model.vo.SearchWord
+import kotlinx.coroutines.CoroutineDispatcher
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -9,8 +12,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GithubApi @Inject constructor(private val service: Service) {
-
+class GithubApi @Inject constructor(private val service: Service,
+                                    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) {
     suspend fun search(
         query: SearchWord,
         page: Int,
@@ -25,11 +29,15 @@ class GithubApi @Inject constructor(private val service: Service) {
         query: String,
         page: Int,
         perPage: Int
-    ) = service.getRepositories(
-        query,
-        page,
-        size = if(perPage < 1) 20 else perPage
-    )
+    ) = safeApiCall(
+        ioDispatcher
+    ) {
+        service.getRepositories(
+            query,
+            page,
+            size = if (perPage < 1) 20 else perPage
+        )
+    }
 
     interface Service {
         @GET("/search/repositories")
@@ -38,6 +46,6 @@ class GithubApi @Inject constructor(private val service: Service) {
             @Query(value = "page") page: Int,
             @Query(value = "order") order: String = "desc",
             @Query(value = "per_page") size: Int = 20,
-        ): Response<RepositoryResponseDto>
+        ): RepositoryResponseDto
     }
 }
