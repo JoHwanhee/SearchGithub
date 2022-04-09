@@ -11,3 +11,6 @@ fun Long.MB() : Long {
 }
 
 inline val Long.MegaBytes: Long get() = this.MB()
+
+fun Boolean.toInt() = if (this) 1 else 0
+fun Int.toBoolean() = this != 0

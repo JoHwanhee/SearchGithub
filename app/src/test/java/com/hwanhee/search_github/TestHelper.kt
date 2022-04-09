@@ -2,6 +2,8 @@ package com.hwanhee.search_github
 
 import com.hwanhee.search_github.di.BaseHeaderInterceptor
 import com.hwanhee.search_github.di.RetrofitModule
+import com.hwanhee.search_github.model.entity.GithubRepositoryItemEntity
+import com.hwanhee.search_github.model.entity.GithubRepositoryOwnerEntity
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

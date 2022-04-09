@@ -9,5 +9,5 @@ import java.time.LocalDateTime
 @Dao
 interface SearchWordDao : BaseDao<SearchWordEntity> {
     @Query("SELECT * FROM search_word WHERE created_at >= :date")
-    suspend fun getSearchWordGreaterThen(date: LocalDateTime): List<SearchWordEntity>
+    suspend fun findSearchWordGreaterThen(date: LocalDateTime): List<SearchWordEntity>
 }

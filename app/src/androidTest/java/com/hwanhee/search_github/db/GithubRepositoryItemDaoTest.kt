@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.hwanhee.search_github.di.DBModule
+import com.hwanhee.search_github.model.entity.GithubRepositoryItemEntity
+import com.hwanhee.search_github.model.entity.GithubRepositoryOwnerEntity
 import com.hwanhee.search_github.model.entity.SearchWordEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
@@ -17,9 +19,10 @@ import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
 
-class SearchWordDaoTest {
+class GithubRepositoryItemDaoTest {
     private val ioThreadSurrogate = newSingleThreadContext("IO thread")
-    private lateinit var searchWordDao: SearchWordDao
+    private lateinit var ownersDao: GithubRepositoryOwnerDao
+    private lateinit var itemDao: GithubRepositoryItemDao
     private lateinit var db: AppDatabase
 
     @Before
@@ -29,8 +32,8 @@ class SearchWordDaoTest {
         val provider = DBModule()
         db = Room.inMemoryDatabaseBuilder(
             context, AppDatabase::class.java).build()
-        searchWordDao = provider.provideSearchWordDao(db)
-
+        ownersDao = provider.provideOwnersDao(db)
+        itemDao = provider.provideItemDao(db)
         Dispatchers.setMain(ioThreadSurrogate)
     }
 
@@ -42,25 +45,24 @@ class SearchWordDaoTest {
 
     @Test
     fun `기본_insert_와_get_이_잘되어야한다`() = runBlocking {
-        val word = SearchWordEntity( 0,"tetris", "Assembly")
-        searchWordDao.insert(word)
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+        ownersDao.insert(owners)
+        itemDao.insert(item)
 
-        val words = searchWordDao.findSearchWordGreaterThen(word.createdAt)
-        val found = words.find { it.id == word.id }
-
-        Assert.assertNotNull(found)
+        val itemAndOwner = itemDao.findGithubRepositoryAndOwnersByRepositoryId(item.id)
+        Assert.assertNotNull(itemAndOwner)
     }
 
     @Test
-    fun `찾으려는_시간보다_더_큰_날짜를_요청한_경우_데이터는_없어야_한다`() = runBlocking {
-        val word = SearchWordEntity( 0,"tetris", "Assembly")
-        searchWordDao.insert(word)
+    fun `Owner_Id로_쿼리가_되어야한다`() = runBlocking {
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+        ownersDao.insert(owners)
+        itemDao.insert(item)
 
-        val date = LocalDateTime.of(2023, 1, 1, 1, 1)
-        val words = searchWordDao.findSearchWordGreaterThen(date)
-        val found = words.find { it.id == word.id }
-
-        Assert.assertNull(found)
+        val itemAndOwner = itemDao.findGithubRepositoryAndOwnersByOwnerId(owners.id)
+        Assert.assertNotNull(itemAndOwner)
     }
 
     @After

@@ -4,21 +4,34 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.hwanhee.search_github.base.toBoolean
+import com.hwanhee.search_github.base.toInt
+import com.hwanhee.search_github.model.entity.GithubRepositoryItemEntity
+import com.hwanhee.search_github.model.entity.GithubRepositoryOwnerEntity
+import com.hwanhee.search_github.model.entity.GithubTopicEntity
 import com.hwanhee.search_github.model.entity.SearchWordEntity
 import java.time.LocalDateTime
 
 
 @Database(
-    entities = [SearchWordEntity::class],
+    entities = [
+        SearchWordEntity::class,
+        GithubRepositoryOwnerEntity::class,
+        GithubRepositoryItemEntity::class,
+        GithubTopicEntity::class,
+    ],
     version = 1,
     exportSchema = false
 )
-@TypeConverters(LocalDateTimeConverter::class)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun searchWordDao(): SearchWordDao
+    abstract fun githubRepositoryOwnerDao(): GithubRepositoryOwnerDao
+    abstract fun githubRepositoryItemDao(): GithubRepositoryItemDao
+    abstract fun githubTopicDao(): GithubTopicDao
 }
 
-object LocalDateTimeConverter {
+object Converters {
     @TypeConverter
     fun toDate(dateString: String?): LocalDateTime? {
         return if (dateString == null) {
@@ -33,4 +46,3 @@ object LocalDateTimeConverter {
         return date?.toString()
     }
 }
-
