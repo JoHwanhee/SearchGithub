@@ -9,9 +9,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.hwanhee.search_github.ui.github_repositories.GithubRepositoriesContract
-import com.hwanhee.search_github.ui.github_repositories.GithubRepositoriesScreen
-import com.hwanhee.search_github.ui.github_repositories.GithubRepositoriesViewModel
+import com.hwanhee.search_github.ui.features.search.GithubRepositoriesContract
+import com.hwanhee.search_github.ui.features.search.GithubRepositoriesScreen
+import com.hwanhee.search_github.ui.features.search.GithubRepositoriesViewModel
 import com.hwanhee.search_github.ui.theme.SearchGithubTheme
 import dagger.hilt.android.AndroidEntryPoint
 

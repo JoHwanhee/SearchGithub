@@ -1,4 +1,4 @@
-package com.hwanhee.search_github.ui.github_repositories
+package com.hwanhee.search_github.ui.features.search
 
 import com.hwanhee.search_github.base.ViewEvent
 import com.hwanhee.search_github.base.ViewSideEffect
@@ -12,7 +12,7 @@ class GithubRepositoriesContract {
         object SearchOn : Event()
         object SearchOff : Event()
         object ScrollMeetsBottom : Event()
-        data class Searched(val searchWord: SearchWord) : Event()
+        data class Searched(val userSearchWord: SearchWord) : Event()
         data class ItemSelected(val url: String) : Event()
         data class SearchTextChanged(val value: String) : Event()
     }

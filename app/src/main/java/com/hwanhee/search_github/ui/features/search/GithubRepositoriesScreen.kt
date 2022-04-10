@@ -1,4 +1,4 @@
-package com.hwanhee.search_github.ui.github_repositories
+package com.hwanhee.search_github.ui.features.search
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image

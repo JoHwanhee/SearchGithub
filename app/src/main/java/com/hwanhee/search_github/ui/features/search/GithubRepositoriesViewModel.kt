@@ -1,4 +1,4 @@
-package com.hwanhee.search_github.ui.github_repositories
+package com.hwanhee.search_github.ui.features.search
 
 import androidx.lifecycle.viewModelScope
 import com.hwanhee.search_github.base.BaseViewModel
@@ -9,6 +9,7 @@ import com.hwanhee.search_github.model.vo.RequestPage
 import com.hwanhee.search_github.model.vo.SearchWord
 import com.hwanhee.search_github.repository.GithubSearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +23,7 @@ class GithubRepositoriesViewModel @Inject constructor(
         GithubRepositoriesContract.Effect>() {
 
     private var _lastRequestedPageCache: RequestPage = RequestPage()
-    private var _lastSearchedCache = SearchWord()
+    private var _lastSearchWord = SearchWord()
     private var _currentItem: RepositoryUIItems = RepositoryUIItems()
 
     override fun handleEvents(event: GithubRepositoriesContract.Event) {
@@ -33,17 +34,17 @@ class GithubRepositoriesViewModel @Inject constructor(
                 selectItemEffect(event.url)
             }
 
-            /** 검색 모드 진입될 때 **/
+            /** 검색 모드 진입 버튼 클릭할 때 **/
             is GithubRepositoriesContract.Event.SearchOn -> {
                 updateSearchTextState("")
-                allocateCacheData()
+                reallocateCacheData()
                 updateSearchModeState(true)
             }
 
-            /** 검색 모드 나갈 때 **/
+            /** 검색 모드 나가기 버튼 클릭할 때 **/
             is GithubRepositoriesContract.Event.SearchOff -> {
                 updateSearchTextState("")
-                allocateCacheData()
+                reallocateCacheData()
                 updateSearchModeState(false)
             }
 
@@ -54,47 +55,50 @@ class GithubRepositoriesViewModel @Inject constructor(
 
             /** 검색 동작할 때 (키보드 확인 버튼) **/
             is GithubRepositoriesContract.Event.Searched -> {
-                allocateCacheData()
-
-                val currentUIItems = _currentItem
-                val searchWord = event.searchWord
-                val searchPage = _lastRequestedPageCache
-                searchRepository(currentUIItems, searchWord, searchPage)
-                setLastSearched(searchWord)
+                reallocateCacheData()
+                search(event.userSearchWord)
             }
 
             /** 스크롤이 바닥을 쳤을 때 **/
             is GithubRepositoriesContract.Event.ScrollMeetsBottom -> {
-                if (isCurrentSearching() and increaseIfNeedMore()){
-                    val currentUIItems = _currentItem
-                    val searchWord = _lastSearchedCache
-                    val searchPage = _lastRequestedPageCache
-                    searchRepository(currentUIItems, searchWord, searchPage)
+                if (isCurrentSearching() && increaseIfNeedMore()){
+                    search(_lastSearchWord)
                 }
             }
-
         }
     }
 
-    private fun searchRepository(currentUIItems: RepositoryUIItems, word: SearchWord, paging: RequestPage) {
-        if (word.isEmpty() or (paging lessThan 1)) return
+    private fun search(searchWord: SearchWord) {
+        val scope = viewModelScope
+        val repository = this.repository
+        val currentUIItems = _currentItem
+        val searchPage = _lastRequestedPageCache
 
-        updateUIItems(currentUIItems)
-        val isLoading = paging.page == 1
-        val isLoadingMore = !isLoading
-        setLoadingState(isLoading, isLoadingMore)
+        search(scope, repository, currentUIItems, searchWord, searchPage)
+    }
 
-        viewModelScope.launch {
+    private fun search(
+        coroutineScope: CoroutineScope,
+        repository: GithubSearchRepository,
+        currentUIItems: RepositoryUIItems,
+        word: SearchWord,
+        paging: RequestPage) {
+        if (checkParams(word, paging)) return
+
+        setLoadingState(paging)
+
+        coroutineScope.launch {
             repository.searchRepository(word, paging)
                 .catch {
                     errorEffect()
                 }
-                .collect { res ->
-                    if(res is RepositoryUIItems) {
-                        val currentItem = addOrCreateUiItems(currentUIItems, paging, res)
+                .collect { newUiItems ->
+                    if(newUiItems is RepositoryUIItems) {
+                        val currentItem = replaceOrMerge(currentUIItems, newUiItems, paging)
                         setLoadingState(false)
                         updateUIItems(currentItem)
-                        setTotal(res)
+                        setLastSearchWord(word)
+                        setTotal(currentItem.total)
                     }
                     else {
                         errorEffect()
@@ -103,11 +107,14 @@ class GithubRepositoriesViewModel @Inject constructor(
         }
     }
 
-    private fun addOrCreateUiItems(
+    private fun replaceOrMerge(
         currentUIItems: RepositoryUIItems,
-        paging: RequestPage,
-        res: RepositoryUIItems
-    ) = if (paging lessThanOrEquals 1) res else currentUIItems.let { currentUIItems.plus(res) }
+        newUiItems: RepositoryUIItems,
+        requestPage: RequestPage
+    ) = if (requestPage lessThanOrEquals 1)
+            newUiItems
+        else
+            currentUIItems + newUiItems
 
     /********************* States *******************/
     override fun setInitialState()
@@ -116,6 +123,12 @@ class GithubRepositoriesViewModel @Inject constructor(
     private fun updateSearchModeState(mode: Boolean)
     = setState {
         copy(isSearchOpened = mode)
+    }
+
+    private fun setLoadingState(paging: RequestPage) {
+        val isLoading = paging.page == 1
+        val isLoadingMore = !isLoading
+        setLoadingState(isLoading, isLoadingMore)
     }
 
     private fun setLoadingState(isLoading: Boolean, isLoadingMore: Boolean = false)
@@ -135,33 +148,38 @@ class GithubRepositoriesViewModel @Inject constructor(
     }
 
     /********************* Effects *******************/
-    private fun selectItemEffect(url: String) =
-        setEffect {
-            GithubRepositoriesContract.Effect.Navigation.ToItemDetails(url)
-        }
-
-    private fun errorEffect() =
-        setEffect {
-            GithubRepositoriesContract.Effect.DataError
-        }
-
-    /********************* Helpers *******************/
-    private fun setLastSearched(searchWord: SearchWord) {
-        _lastSearchedCache = searchWord
+    private fun selectItemEffect(url: String)
+    = setEffect {
+        GithubRepositoriesContract.Effect.Navigation.ToItemDetails(url)
     }
 
-    private fun setTotal(it: RepositoryUIItems) {
-        _lastRequestedPageCache.total = it.total
+    private fun errorEffect()
+    = setEffect {
+        GithubRepositoriesContract.Effect.DataError
+    }
+
+    /********************* Helpers *******************/
+    private fun checkParams(
+        word: SearchWord,
+        paging: RequestPage
+    ) = word.isEmpty() || (paging lessThan 1)
+
+    private fun setLastSearchWord(searchWord: SearchWord) {
+        _lastSearchWord = searchWord
+    }
+
+    private fun setTotal(it: Int) {
+        _lastRequestedPageCache.total = it
     }
 
     /**
      * 캐시에 사용하는 데이터들을 재할당해준다.
      *  -> 객체 재활용시 버그 유발 가능성이 높음
      * */
-    private fun allocateCacheData() {
+    private fun reallocateCacheData() {
         _currentItem = RepositoryUIItems()
         _lastRequestedPageCache = RequestPage()
-        _lastSearchedCache = SearchWord()
+        _lastSearchWord = SearchWord()
     }
 
     private fun increaseIfNeedMore() : Boolean {

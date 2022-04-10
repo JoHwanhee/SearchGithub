@@ -36,10 +36,10 @@ infix fun Int.lessThan(other: Int)
     = this < other
 
 infix fun Int.lessThanOrEquals(other: Int)
-        = this < other
+    = this < other
 
 infix fun RequestPage.lessThan(other: Int)
-        = this.page lessThan other
+    = this.page lessThan other
 
 infix fun RequestPage.lessThanOrEquals(other: Int)
-        = this.page lessThanOrEquals other
+    = this.page lessThanOrEquals other
