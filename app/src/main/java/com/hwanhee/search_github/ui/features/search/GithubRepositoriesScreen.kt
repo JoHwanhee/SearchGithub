@@ -435,7 +435,7 @@ fun EtcInformationRow(
 
         Spacer(modifier = Modifier.padding(2.dp))
 
-        Text(text = item.language.toString(),
+        Text(text = item.language,
             textAlign = TextAlign.Start,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.caption,

@@ -6,8 +6,8 @@ import com.hwanhee.search_github.db.GithubRepositoryOwnerDao
 import com.hwanhee.search_github.db.GithubTopicDao
 import com.hwanhee.search_github.di.IoDispatcher
 import com.hwanhee.search_github.model.ResultWrapper
+import com.hwanhee.search_github.model.dto.ItemDto
 import com.hwanhee.search_github.model.dto.RepositoryResponseDto
-import com.hwanhee.search_github.model.entity.GithubRepositoryItemAndOwner
 import com.hwanhee.search_github.model.entity.GithubRepositoryItemEntity
 import com.hwanhee.search_github.model.entity.GithubRepositoryOwnerEntity
 import com.hwanhee.search_github.model.entity.GithubTopicEntity
@@ -29,23 +29,16 @@ class GithubSearchRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend fun searchRepository(word: SearchWord, page: RequestPage) = flow {
-        when (val res = searchFromNetwork(word, page)) {
+        when (val dataFromNetwork = searchFromNetwork(word, page)) {
             is ResultWrapper.Success -> {
-                res.let {
-                    val uiItem = RepositoryUIItems.from(it.value)
-                    emit(uiItem)
-
+                dataFromNetwork.let {
+                    emit(RepositoryUIItems.from(it.value))
                     insertsToDatabase(it)
                 }
             }
             else -> {
-                // 네트워크 실패 시, 디비에서 조회한다.
                 val dataFromDb = searchFromDatabase(word)
-                RepositoryUIItems.from(dataFromDb).let {
-                    if(it.items.isNotEmpty())
-                        emit(it)
-                }
-
+                emit(RepositoryUIItems.from(dataFromDb))
                 emit(ResultWrapper.NetworkError)
             }
         }
@@ -53,36 +46,33 @@ class GithubSearchRepository @Inject constructor(
     .flowOn(ioDispatcher)
 
     private suspend fun insertsToDatabase(res: ResultWrapper.Success<RepositoryResponseDto>) {
-        if(res.value.items.isEmpty())
+        val items = res.value.items.filterByNotNullOwners()
+        if (items.isEmpty())
             return
 
-        val items = res.value.items.filter { it.ownerDto != null }
-
-        val repositoryList = items.map { GithubRepositoryItemEntity.from(it) }
-        itemDao.upsert(repositoryList)
-
-        val ownerList = items.map { GithubRepositoryOwnerEntity.from(it.ownerDto!!) }
-        ownerDao.upsert(ownerList)
-
-        items.map {
-            it.id to it.topics
-        }
-        .forEach { pair ->
-            pair.second.forEach { topic ->
-                pair.first?.let { repositoryId ->
-                    topicDao.upsert(GithubTopicEntity.from(repositoryId, topic))
-                }
-            }
-        }
+        ownerDao.upsert(items.mapOwnerEntities())
+        itemDao.upsert(items.mapRepositoryEntities())
+        topicDao.upsert(items.mapTopicEntities())
     }
 
-    private suspend fun searchFromDatabase(word: SearchWord): List<GithubRepositoryItemAndOwner> {
-        return if(word.isExtensionSearch)
-            itemDao.searchByLanguage("%${word.keyword}%", word.language)
-        else
-            itemDao.search("%${word.keyword}%")
-    }
+    private suspend fun searchFromDatabase(word: SearchWord) = itemDao.search(word.toLikeQueryString())
 
-    private suspend fun searchFromNetwork(word: SearchWord, page: RequestPage)
-        = api.search(word, page)
+    private suspend fun searchFromNetwork(word: SearchWord, page: RequestPage) = api.search(word, page)
+
+    /** Helpers **/
+    private fun List<ItemDto>.filterByNotNullOwners()
+    = this.filter { it.ownerDto != null }
+
+    private fun List<ItemDto>.mapOwnerEntities()
+    = this.filter { it.ownerDto != null }
+          .map { GithubRepositoryOwnerEntity.from(it.ownerDto!!) }
+
+    private fun List<ItemDto>.mapRepositoryEntities()
+    = this.map { GithubRepositoryItemEntity.from(it) }
+
+    private fun List<ItemDto>.mapTopicEntities()
+    = this.filter { itemDto -> itemDto.id != null }
+          .flatMap { itemDto ->
+                itemDto.topics.map { GithubTopicEntity.from(itemDto.id!!, it) }
+          }
 }
