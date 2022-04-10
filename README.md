@@ -1,4 +1,4 @@
-# SearchGithub
+(# SearchGithub
 깃허브 공개 레포지토리를 검색하는 앱 입니다. Jetpack Compose UI와 MVI+MVVM패턴을 사용하여 개발 되었습니다. 로컬 데이터베이스를 활용해 네트워크가 불안정한 상태에선, 로컬에 미리 저장된 데이터 베이스를 통해 데이터를 검색하도록 개발 되었습니다.
 
 # 아키텍쳐
@@ -9,22 +9,19 @@
 # 디펜던시
 - UI
   - [Compose](https://developer.android.com/jetpack/compose)
-
 - Language
   - [Kotlin](https://kotlinlang.org/)
   - [Coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html)
   - [Flow](https://developer.android.com/kotlin/flow)
-
 - DI
   - [Hilt](https://developer.android.com/training/dependency-injection/hilt-android)
-
 - Database
   - [Room](https://developer.android.com/topic/libraries/architecture/room)
-
 - [Jetpack](https://developer.android.com/jetpack)
   - [Navigation](https://developer.android.com/topic/libraries/architecture/navigation/)
   - [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel)
-
 - Network
   - [Retrofit](https://square.github.io/retrofit/)
   - [Coil](https://github.com/coil-kt/coil)
+- Test
+  - [Kotest](https://kotest.io/docs/quickstart/)
