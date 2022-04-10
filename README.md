@@ -32,6 +32,8 @@
 - Test
   - [Kotest](https://kotest.io/docs/quickstart/)
 
+# 커밋 규칙
+- [Conventional commit](https://www.conventionalcommits.org/ko/v1.0.0/)을 따르고 있습니다.
 
 # 메드 스코어
 - https://madscorecard.withgoogle.com/scorecards/1247467223/
