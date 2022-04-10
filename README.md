@@ -7,6 +7,9 @@
 - 무한 스크롤
 - 오프라인 모드 지원
 
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/RfcXFgqp_bg/0.jpg)](https://youtu.be/RfcXFgqp_bg "Video Title")
+
+
 # 아키텍쳐
 상태지향 아키텍쳐를 채택하여 [Gogle AAC](https://developer.android.com/jetpack/guide?hl=ko)에 [MVI](https://jaehochoe.medium.com/%EB%B2%88%EC%97%AD-%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C%EB%A5%BC-%EC%9C%84%ED%95%9C-mvi-model-view-intent-%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90-%ED%8A%9C%ED%86%A0%EB%A6%AC%EC%96%BC-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0-165bda9dfbe7)를 곁들인 구조입니다. 이 앱의 전체적인 데이터의 흐름은 다음과 같습니다.
 
@@ -32,6 +35,8 @@
 - Test
   - [Kotest](https://kotest.io/docs/quickstart/)
 
+# 커밋 규칙
+- [Conventional commit](https://www.conventionalcommits.org/ko/v1.0.0/)을 따르고 있습니다.
 
 # 메드 스코어
 - https://madscorecard.withgoogle.com/scorecards/1247467223/
