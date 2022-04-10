@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">search_github</string>
+    <string name="app_name">Search github</string>
     <string name="network_not_smooth">Network is not smooth.</string>
     <string name="search">Search a repo</string>
     <string name="app_bar_title">Search Github Repository</string>

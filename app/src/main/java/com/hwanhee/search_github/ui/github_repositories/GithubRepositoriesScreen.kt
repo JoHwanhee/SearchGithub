@@ -110,28 +110,22 @@ fun GithubRepositoriesScreen(
             )
         },
     ) {
-        Box {
-            when {
-                state.isLoading -> LoadingBar()
-                state.repositoryUIItems?.isEmpty ?: true -> {
-                    NoItem()
-                }
-                else -> {
-                    RepositoryList(
-                        listState = listState,
-                        repositoryUIItems = state.repositoryUIItems,
-                        isLoadingMoreState = state.isLoadingMore,
-                        onItemClicked = { itemId -> onEventSent(GithubRepositoriesContract.Event.ItemSelected(itemId))
-                        },
-                        onScrollInProgress = {
-                            focusManager.clearFocus()
-                        },
-                        onScrollMeetsBottom = {
-                            onEventSent(GithubRepositoriesContract.Event.ScrollMeetsBottom)
-                        }
-                    )
-
-                }
+        when {
+            state.isLoading -> LoadingBar()
+            state.isSearchOpened -> {
+                RepositoryList(
+                    listState = listState,
+                    repositoryUIItems = state.repositoryUIItems,
+                    isLoadingMoreState = state.isLoadingMore,
+                    onItemClicked = { itemId -> onEventSent(GithubRepositoriesContract.Event.ItemSelected(itemId))
+                    },
+                    onScrollInProgress = {
+                        focusManager.clearFocus()
+                    },
+                    onScrollMeetsBottom = {
+                        onEventSent(GithubRepositoriesContract.Event.ScrollMeetsBottom)
+                    }
+                )
             }
         }
     }
@@ -139,13 +133,15 @@ fun GithubRepositoriesScreen(
 
 @Composable
 fun NoItem() {
-    Image(
-        painterResource(R.drawable.ic_baseline_search_off_24),
-        contentDescription = "",
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(150.dp)
-    )
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Icon(
+            painterResource(R.drawable.ic_baseline_search_off_24),
+            contentDescription = "",
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(150.dp)
+        )
+    }
 }
 
 @Composable
@@ -306,36 +302,36 @@ fun RepositoryList(
     onScrollInProgress: () -> Unit = { },
     onScrollMeetsBottom: () -> Unit = { }
 ) {
-    LazyColumn(
-        state= listState,
-        contentPadding = PaddingValues(bottom = 16.dp)
-    ) {
-        repositoryUIItems?.let {
-            items(repositoryUIItems.items) { item ->
-                ItemRow(item = item, onItemClicked = onItemClicked)
-                Divider()
-            }
-        }
-
-        if(repositoryUIItems?.items?.isNullOrEmpty() != false) {
-            item {
-                NoItem()
-            }
-        }
-
-        if (isLoadingMoreState) {
-            item {
-                LoadingBar()
-            }
-        }
+    if(repositoryUIItems?.isEmpty != false) {
+        NoItem()
     }
+    else {
+        LazyColumn(
+            state= listState,
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+            repositoryUIItems?.let {
+                items(repositoryUIItems.items) { item ->
+                    ItemRow(item = item, onItemClicked = onItemClicked)
+                    Divider()
+                }
+            }
 
-    if(listState.isScrollInProgress) {
-        onScrollInProgress.invoke()
-    }
 
-    InfiniteListHandler(listState = listState) {
-        onScrollMeetsBottom.invoke()
+            if (isLoadingMoreState) {
+                item {
+                    LoadingBar()
+                }
+            }
+        }
+
+        if(listState.isScrollInProgress) {
+            onScrollInProgress.invoke()
+        }
+
+        InfiniteListHandler(listState = listState) {
+            onScrollMeetsBottom.invoke()
+        }
     }
 }
 
