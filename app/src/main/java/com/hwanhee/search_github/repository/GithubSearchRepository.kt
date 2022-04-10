@@ -1,8 +1,6 @@
 package com.hwanhee.search_github.repository
 
 import com.hwanhee.search_github.GithubApi
-import com.hwanhee.search_github.base.UNDEFINED_ID
-import com.hwanhee.search_github.base.lessThan
 import com.hwanhee.search_github.db.GithubRepositoryItemDao
 import com.hwanhee.search_github.db.GithubRepositoryOwnerDao
 import com.hwanhee.search_github.db.GithubTopicDao
@@ -42,7 +40,8 @@ class GithubSearchRepository @Inject constructor(
             }
             else -> {
                 // 네트워크 실패 시, 디비에서 조회한다.
-                RepositoryUIItems.from(searchFromEntity(word)).let {
+                val dataFromDb = searchFromDatabase(word)
+                RepositoryUIItems.from(dataFromDb).let {
                     if(it.items.isNotEmpty())
                         emit(it)
                 }
@@ -60,10 +59,10 @@ class GithubSearchRepository @Inject constructor(
         val items = res.value.items.filter { it.ownerDto != null }
 
         val repositoryList = items.map { GithubRepositoryItemEntity.from(it) }
-        itemDao.insert(repositoryList)
+        itemDao.upsert(repositoryList)
 
         val ownerList = items.map { GithubRepositoryOwnerEntity.from(it.ownerDto!!) }
-        ownerDao.insert(ownerList)
+        ownerDao.upsert(ownerList)
 
         items.map {
             it.id to it.topics
@@ -71,13 +70,13 @@ class GithubSearchRepository @Inject constructor(
         .forEach { pair ->
             pair.second.forEach { topic ->
                 pair.first?.let { repositoryId ->
-                    topicDao.insert(GithubTopicEntity.from(repositoryId, topic))
+                    topicDao.upsert(GithubTopicEntity.from(repositoryId, topic))
                 }
             }
         }
     }
 
-    private suspend fun searchFromEntity(word: SearchWord): List<GithubRepositoryItemAndOwner> {
+    private suspend fun searchFromDatabase(word: SearchWord): List<GithubRepositoryItemAndOwner> {
         return if(word.isExtensionSearch)
             itemDao.searchByLanguage("%${word.keyword}%", word.language)
         else

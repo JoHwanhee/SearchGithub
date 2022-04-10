@@ -121,6 +121,26 @@ class GithubTopicDaoTest {
         Assert.assertTrue(itemAndOwner.count() == 0)
     }
 
+    @Test
+    fun `upsert_할_경우_데이터가_교체_되어야_한다`() = runBlocking {
+        val owners = createTestOwners(1)
+        val item = createTestItem(owners.id)
+
+        // Upsert 할 경우
+        ownersDao.upsert(owners)
+        itemDao.upsert(item)
+
+        val newItem = createTestItem2(owners.id)
+        itemDao.upsert(newItem)
+
+        // 기존에 넣었던 item 으로 get 했을 때
+        val needChangedItems = itemDao.findGithubRepositoryAndOwnersByRepositoryId(item.id)
+
+        // 이 아이템 데이터가 갱신 되었어야 한다.
+        val firstItem = needChangedItems.first()
+        Assert.assertTrue(firstItem.itemEntity.name == newItem.name)
+    }
+
     @After
     fun tearDown() {
         Dispatchers.resetMain()

@@ -22,6 +22,25 @@ fun createTestItem(ownerId: Long): GithubRepositoryItemEntity {
     )
 }
 
+fun createTestItem2(ownerId: Long): GithubRepositoryItemEntity {
+    return GithubRepositoryItemEntity(
+        0,
+        "테스트 레포2",
+        "테스트 레포 풀 네임2",
+        false,
+        ownerId,
+        "설명",
+        "https://github.com",
+        "https://github.com",
+        10,
+        10,
+        10,
+        "assembly",
+        false
+    )
+}
+
+
 fun createTestOwners(id:Long): GithubRepositoryOwnerEntity {
     return GithubRepositoryOwnerEntity(
         id,
