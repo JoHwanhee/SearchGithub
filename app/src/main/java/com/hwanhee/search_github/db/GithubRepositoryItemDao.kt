@@ -19,11 +19,11 @@ interface GithubRepositoryItemDao : BaseDao<GithubRepositoryItemEntity> {
             "LEFT JOIN github_topic " +
             "ON github_repository_item.id = github_topic.repository_id " +
             "WHERE github_repository_item.id != -1 " +
-            "AND github_topic.topic LIKE :searchWord " +
+            "AND (github_topic.topic LIKE :searchWord " +
             "OR github_repository_item.name LIKE :searchWord " +
             "OR github_repository_item.full_name LIKE :searchWord " +
             "OR github_repository_item.description LIKE :searchWord " +
-            "OR language LIKE :searchWord " +
+            "OR language LIKE :searchWord )" +
             "GROUP BY github_repository_item.id "  +
             "ORDER BY github_repository_item.created_at DESC "
     )
@@ -35,8 +35,8 @@ interface GithubRepositoryItemDao : BaseDao<GithubRepositoryItemEntity> {
             "WHERE github_repository_item.id != -1 " +
             "AND (github_topic.topic LIKE :searchWord " +
             "OR github_repository_item.name LIKE :searchWord " +
-            "OR github_repository_item.full_name LIKE :searchWord) " +
-            "OR github_repository_item.description LIKE :searchWord " +
+            "OR github_repository_item.full_name LIKE :searchWord " +
+            "OR github_repository_item.description LIKE :searchWord)" +
             "AND language LIKE :language " +
             "GROUP BY github_repository_item.id " +
             "ORDER BY github_repository_item.created_at DESC "
