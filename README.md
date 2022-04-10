@@ -31,3 +31,9 @@
   - [Coil](https://github.com/coil-kt/coil)
 - Test
   - [Kotest](https://kotest.io/docs/quickstart/)
+
+
+# 메드 스코어
+- https://madscorecard.withgoogle.com/scorecards/1247467223/
+
+![스크린샷 2022-04-10 오후 6 15 44](https://user-images.githubusercontent.com/12796737/162611369-a442f2e2-9fb6-44f0-a0dd-1334c3120070.png)
