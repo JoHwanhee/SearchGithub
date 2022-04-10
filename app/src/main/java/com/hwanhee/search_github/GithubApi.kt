@@ -12,8 +12,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GithubApi @Inject constructor(private val service: Service,
-                                    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+class GithubApi @Inject constructor (
+    private val service: Service,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend fun search(
         query: SearchWord,

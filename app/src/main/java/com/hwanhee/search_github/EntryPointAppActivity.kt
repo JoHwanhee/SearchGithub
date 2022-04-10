@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.hwanhee.search_github.ui.github_repositories.GithubRepositoriesContract
 import com.hwanhee.search_github.ui.github_repositories.GithubRepositoriesScreen
 import com.hwanhee.search_github.ui.github_repositories.GithubRepositoriesViewModel
-import com.hwanhee.search_github.ui.theme.Search_githubTheme
+import com.hwanhee.search_github.ui.theme.SearchGithubTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,7 +20,7 @@ class EntryPointAppActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Search_githubTheme {
+            SearchGithubTheme {
                 SearchGithubApp()
             }
         }
@@ -41,7 +41,7 @@ private fun SearchGithubApp() {
 private fun GithubRepositoriesDestination() {
     val viewModel: GithubRepositoriesViewModel = hiltViewModel()
     val state = viewModel.viewState.value
-    val searchTextState = viewModel.searchTextState.value
+    val searchTextState = state.searchText
     val uriHandler = LocalUriHandler.current
 
     GithubRepositoriesScreen(

@@ -19,6 +19,7 @@ class GithubRepositoriesContract {
 
     // 해당 화면의 현재 상태(데이터)들을 정의한다.
     data class State(val repositoryUIItems: RepositoryUIItems? = null,
+                     val searchText: String = "",
                      val isSearchOpened: Boolean = false,
                      val isLoadingMore: Boolean = false,
                      val isLoading: Boolean = false) : ViewState
