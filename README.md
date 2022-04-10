@@ -7,6 +7,7 @@
 - 무한 스크롤
 - 오프라인 모드 지원
 
+# 동작 영상
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/RfcXFgqp_bg/0.jpg)](https://youtu.be/RfcXFgqp_bg "Video Title")
 
 
@@ -38,7 +39,7 @@
 # 커밋 규칙
 - [Conventional commit](https://www.conventionalcommits.org/ko/v1.0.0/)을 따르고 있습니다.
 
-# 메드 스코어
+# 매드 스코어
 - https://madscorecard.withgoogle.com/scorecards/1247467223/
 
 ![스크린샷 2022-04-10 오후 6 15 44](https://user-images.githubusercontent.com/12796737/162611369-a442f2e2-9fb6-44f0-a0dd-1334c3120070.png)
