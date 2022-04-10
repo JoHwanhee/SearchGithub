@@ -17,7 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
 
-class SearchWordDaoTest {
+class SearchedWordDaoTest {
     private val ioThreadSurrogate = newSingleThreadContext("IO thread")
     private lateinit var searchWordDao: SearchWordDao
     private lateinit var db: AppDatabase

@@ -3,8 +3,8 @@ package com.hwanhee.search_github.model.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.hwanhee.search_github.base.UNDEFINED_ID
 import com.hwanhee.search_github.model.dto.ItemDto
-import com.hwanhee.search_github.model.ui.RepositoryUIItem
 import java.time.LocalDateTime
 
 @Entity(tableName = "github_repository_item")
@@ -27,11 +27,11 @@ data class GithubRepositoryItemEntity (
     companion object {
         fun from(itemDto: ItemDto)
                 = GithubRepositoryItemEntity(
-                itemDto.id ?: 0,
+                itemDto.id ?: UNDEFINED_ID,
             itemDto.name ?: "",
             itemDto.fullName ?: "",
             itemDto.private ?: false,
-            itemDto.ownerDto?.id ?: 0,
+            itemDto.ownerDto?.id ?: UNDEFINED_ID,
             itemDto.description ?: "",
             itemDto.htmlUrl ?: "",
             itemDto.homepage ?: "",

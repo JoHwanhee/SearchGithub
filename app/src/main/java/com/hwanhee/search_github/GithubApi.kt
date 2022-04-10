@@ -6,7 +6,6 @@ import com.hwanhee.search_github.model.safeApiCall
 import com.hwanhee.search_github.model.vo.RequestPage
 import com.hwanhee.search_github.model.vo.SearchWord
 import kotlinx.coroutines.CoroutineDispatcher
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 import javax.inject.Inject

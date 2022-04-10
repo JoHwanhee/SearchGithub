@@ -4,8 +4,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.hwanhee.search_github.base.toBoolean
-import com.hwanhee.search_github.base.toInt
 import com.hwanhee.search_github.model.entity.GithubRepositoryItemEntity
 import com.hwanhee.search_github.model.entity.GithubRepositoryOwnerEntity
 import com.hwanhee.search_github.model.entity.GithubTopicEntity

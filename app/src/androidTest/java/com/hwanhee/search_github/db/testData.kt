@@ -26,6 +26,7 @@ fun createTestOwners(id:Long): GithubRepositoryOwnerEntity {
     return GithubRepositoryOwnerEntity(
         id,
         "https://avatars.githubusercontent.com/u/20634838?v=4",
+        "test",
         "https://github.com",
         "assembly",
     )

@@ -22,7 +22,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
-class GithubSearchRepositoryTest {
+class GithubSearchedRepositoryTest {
     private val ioThreadSurrogate = newSingleThreadContext("IO thread")
     private lateinit var repository: GithubSearchRepository
     private lateinit var db: AppDatabase
@@ -59,7 +59,7 @@ class GithubSearchRepositoryTest {
 
     @Test
     fun `데이터_수집_성공_되어야_한다`() = runBlocking {
-        repository.searchRepository(SearchWord("tetris"), RequestPage(1, 20)).collect {
+        repository.searchRepository(SearchWord("tetris"), RequestPage(1, 20, 20)).collect {
             if(it is RepositoryUIItems) {
                 Assert.assertNotNull(it.items)
             }
@@ -70,7 +70,7 @@ class GithubSearchRepositoryTest {
     fun `요청이_20개면_20개_리턴_되어야_한다`() = runBlocking {
         val perPage = 20
 
-        repository.searchRepository(SearchWord("tetris"), RequestPage(1, perPage)).collect {
+        repository.searchRepository(SearchWord("tetris"), RequestPage(1, perPage, perPage)).collect {
             if(it is RepositoryUIItems) {
                 Assert.assertNotNull(it.items)
                 Assert.assertTrue(it.items.count() == perPage)
@@ -82,7 +82,7 @@ class GithubSearchRepositoryTest {
     fun `요청이_7개면_7개_리턴_되어야_한다`() = runBlocking {
         val perPage = 7
 
-        repository.searchRepository(SearchWord("tetris"), RequestPage(1, perPage)).collect {
+        repository.searchRepository(SearchWord("tetris"), RequestPage(1, perPage, perPage)).collect {
             if(it is RepositoryUIItems) {
                 Assert.assertNotNull(it.items)
                 Assert.assertTrue(it.items.count() == perPage)
@@ -94,7 +94,7 @@ class GithubSearchRepositoryTest {
     fun `Assembly_언어_요청하면_Assembly만_있어야_한다`() = runBlocking {
         val perPage = 7
 
-        repository.searchRepository(SearchWord("tetris", "Assembly"), RequestPage(1, perPage)).collect { it ->
+        repository.searchRepository(SearchWord("tetris", "Assembly"), RequestPage(1, perPage, perPage)).collect { it ->
             if(it is RepositoryUIItems) {
                 Assert.assertNotNull(it.items)
                 Assert.assertTrue(it.items.count() == perPage)
@@ -113,7 +113,7 @@ class GithubSearchRepositoryTest {
     fun `공백문자를_검색하면_파싱된_에러가_리스폰스_되어야한다`() = runBlocking {
         val perPage = 7
 
-        repository.searchRepository(SearchWord(""), RequestPage(1, perPage)).collect { it ->
+        repository.searchRepository(SearchWord(""), RequestPage(1, perPage, perPage)).collect { it ->
             if(it is ResultWrapper.Error) {
                 Assert.assertNotNull(it)
 

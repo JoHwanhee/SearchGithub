@@ -1,16 +1,45 @@
 package com.hwanhee.search_github.base
 
-fun Int.MB() : Long {
-    return (this * 1024 * 1024).toLong()
+import androidx.compose.ui.graphics.Color
+import com.hwanhee.search_github.model.vo.RequestPage
+import java.security.MessageDigest
+
+inline val String.hashColor
+    get() = Color.parse("#" + this.sha256()
+        .substring(0, 6)
+        .toLong(radix = 16)
+        .toString(16)
+        .padStart(6, '0')
+    )
+
+fun Color.Companion.parse(colorString: String): Color {
+    return try {
+        Color(color = android.graphics.Color.parseColor(colorString))
+    }
+    catch (e: Exception) {
+        Red
+    }
 }
 
-inline val Int.MegaBytes: Long get() = this.MB()
-
-fun Long.MB() : Long {
-    return (this * 1024 * 1024)
+fun String.sha256(): String {
+    return hashString(this, "SHA-256")
 }
 
-inline val Long.MegaBytes: Long get() = this.MB()
+private fun hashString(input: String, algorithm: String): String {
+    return MessageDigest
+        .getInstance(algorithm)
+        .digest(input.toByteArray())
+        .fold("") { str, it -> str + "%02x".format(it) }
+}
 
-fun Boolean.toInt() = if (this) 1 else 0
-fun Int.toBoolean() = this != 0
+infix fun Int.lessThan(other: Int)
+    = this < other
+
+infix fun Int.lessThanOrEquals(other: Int)
+        = this < other
+
+infix fun RequestPage.lessThan(other: Int)
+        = this.page lessThan other
+
+infix fun RequestPage.lessThanOrEquals(other: Int)
+        = this.page lessThanOrEquals other

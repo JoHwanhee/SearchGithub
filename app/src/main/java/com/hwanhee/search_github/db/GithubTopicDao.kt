@@ -1,7 +1,8 @@
 package com.hwanhee.search_github.db
 
-import androidx.room.*
-import com.hwanhee.search_github.model.entity.*
+import androidx.room.Dao
+import androidx.room.Query
+import com.hwanhee.search_github.model.entity.GithubTopicEntity
 
 
 @Dao

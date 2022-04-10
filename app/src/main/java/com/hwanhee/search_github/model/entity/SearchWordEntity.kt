@@ -3,7 +3,6 @@ package com.hwanhee.search_github.model.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity(tableName = "search_word")

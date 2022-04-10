@@ -3,7 +3,6 @@ package com.hwanhee.search_github.di
 import android.content.Context
 import androidx.room.Room
 import com.hwanhee.search_github.db.*
-import com.hwanhee.search_github.model.entity.GithubTopicEntity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

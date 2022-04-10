@@ -1,14 +1,12 @@
 package com.hwanhee.search_github.di
 
-import android.app.Application
 import com.hwanhee.search_github.GithubApi
 import com.hwanhee.search_github.base.GITHUB_API_HOST
-import com.hwanhee.search_github.base.MegaBytes
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.*
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
